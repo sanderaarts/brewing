@@ -17,7 +17,9 @@ echo $NOW > $LAST_RUN_FILE
 if [ $(( (NOW - THEN) / 3600 )) -gt $MIN_INTERVAL_HOURS ]; then
   echo "\nbrew upgrade --greedy\n"
   brew upgrade --greedy --dry-run
-  #echo $NOW > $LAST_RUN_FILE
+
+  # Update last run's timestamp
+  echo $NOW > $LAST_RUN_FILE
 else
   # Restore original timestamp
   echo $THEN > $LAST_RUN_FILE
