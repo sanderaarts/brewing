@@ -15,7 +15,10 @@ NOW=$(date +%s)
 echo $NOW > $LAST_RUN_FILE
 
 if [ $(( (NOW - THEN) / 3600 )) -gt $MIN_INTERVAL_HOURS ]; then
-  echo "\nbrew upgrade --greedy\n"
+  echo 'Running `brew upgrade --greedy --dry-run` to see if there any outdated packages.'
+  echo 'If so, run:'
+  echo '\nbrew upgrade --greedy\n'
+  echo 'If a cask gives an error (unavailable/does not exist), then reinstall it: `brew reinstall FORMULA` or `brew reinstall --cask CASK`'
   brew upgrade --greedy --dry-run
 
   # Update last run's timestamp
