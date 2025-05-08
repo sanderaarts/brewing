@@ -1,20 +1,26 @@
 #!/bin/sh
 
 # config
-MIN_INTERVAL_HOURS=12
-LAST_RUN_FILE=$(dirname -- "$(readlink -f "${BASH_SOURCE}")")/.last-run
+DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")
+INTERVAL=$DIR/.interval
+LAST_RUN=$DIR/.last-run
 
-if [ -f $LAST_RUN_FILE ]; then
-  read THEN < $LAST_RUN_FILE
+if [ -f $INTERVAL ]; then
+  read MIN_INTERVAL_HOURS < $INTERVAL
+else
+  MIN_INTERVAL_HOURS=24
+fi
+if [ -f $LAST_RUN ]; then
+  read THEN < $LAST_RUN
 else
   THEN=0
 fi
 NOW=$(date +%s)
 
 # Alway update last run timestamp to minimize changes that multiple shells will run the check in parallel
-echo $NOW > $LAST_RUN_FILE
+echo $NOW > $LAST_RUN
 
-if [ $(( (NOW - THEN) / 3600 )) -gt $MIN_INTERVAL_HOURS ]; then
+if [ $(( (NOW - THEN) / 3600 )) -ge $MIN_INTERVAL_HOURS ]; then
   echo 'Running `brew upgrade --greedy --dry-run` to see if there any outdated packages.'
   echo 'If so, run:'
   echo '\nbrew upgrade --greedy\n'
@@ -22,8 +28,8 @@ if [ $(( (NOW - THEN) / 3600 )) -gt $MIN_INTERVAL_HOURS ]; then
   brew upgrade --greedy --dry-run
 
   # Update last run's timestamp
-  echo $NOW > $LAST_RUN_FILE
+  echo $NOW > $LAST_RUN
 else
   # Restore original timestamp
-  echo $THEN > $LAST_RUN_FILE
+  echo $THEN > $LAST_RUN
 fi
